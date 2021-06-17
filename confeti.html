@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://unpkg.com/konva@2.4.2/konva.min.js"></script>
+  <meta charset="utf-8">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background-color: #10151A;
+    }
+
+    button {
+      border-radius: 50%;
+      margin-left: 20%;
+      background-color: white;
+    }
+  </style>
+</head>
+<body>
+  <div id="container"></div>
+  <button id="celebrate" onClick="generateCelebration()">Celebrar</button>
+  <script>
+
+    var width = 800;
+    var height = 600;
+    
+    var stage = new Konva.Stage({
+      container: 'container',
+      width: width,
+      height: height,
+    });
+
+    var confetiLayer = new Konva.Layer();
+
+    const radius = 15;
+    const colours = ['#fde132', '#009bde', '#ff6b00'];
+    
+    var animConfites = new Konva.Animation(function (frame) { 
+        updateConfites(frame);
+    }, confetiLayer);
+
+
+    let confites;
+    let speedInit = 3;
+    let amplitudeIncrement = 100;
+    let amplitudeInit = 30;
+    let periodInit = 500;
+    let periodIncrement = 300;
+    stage.add(confetiLayer);
+
+
+
+    function updateConfites(frame){
+      confites.forEach(element => {
+        var x = element.confite.x();
+        var y = element.confite.y();
+        y+=element.speed;
+        x= element.amplitude * Math.sin((frame.time) / element.period) + element.centerX
+        element.confite.position({x:x,y:y});
+      });
+    }
+    
+    let audio = new Audio('dale-dale-dale-boca.mp3');
+
+    function generateCelebration(){          
+      confetiLayer.find('Circle').destroy();
+      confetiLayer.draw();
+      var numberOfConfites = 500 + Math.random()*20
+      confites = generateConfites(numberOfConfites);
+      confites.forEach(confite => {
+        confetiLayer.add(confite.confite);
+      });
+     
+      audio.play();
+      animConfites.start();
+    }
+
+    function generateConfites(num){
+      var confites = [];
+      for(var i=0 ; i<= num ; i++){
+        var ball = new Konva.Circle({
+            x: Math.round(Math.random() * width),
+            y: Math.round(Math.random() * height*4)-(height*8/2),
+            radius: Math.random()*radius + 5,
+            fill: colours[Math.floor(colours.length * Math.random())],
+            draggable: false,
+            opacity: 0.8,
+          });
+        confites.push({confite: ball, speed : Math.random()*speedInit + 5, centerX:ball.x(), period:Math.random()*periodIncrement + periodInit, amplitude:Math.random()*amplitudeIncrement + amplitudeInit});
+      }
+      return confites;
+    }
+
+  </script>
+
+</body>
+
+
+
+
+</html>
